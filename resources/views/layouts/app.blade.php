@@ -105,3 +105,8 @@
 @yield('scripts')
 </body>
 </html>
+<style>
+    .navbar-brand img {
+        height: 90%;
+    }
+</style>

@@ -27,6 +27,7 @@ Route::post('/admin/addStock', 'ProductController@addStock');
 Route::post('/admin/decreaseStock', 'ProductController@decreaseStock');
 Route::get('/admin/stock', 'ProductController@stock')->name('estoque');
 Route::get('/removeItem','SellController@removeItem')->name('removeItem');
+Route::get('/ficha', 'SellController@printOrder')->name('admin.sells.ficha');
 Route::post('/home', 'SellController@addProducts');
 Route::post('/home/cod', 'SellController@codBarra');
 Route::post('/criarMesa', 'SellController@criarMesa');
@@ -92,4 +93,5 @@ Route::post('/vincularMesa', 'DeskController@vincularMesa')->name('vincularMesa'
 Route::post('/criarMesaVenda', 'DeskController@criarMesaVenda')->name('criarMesaVenda');
 Route::post('/excluirMesa', 'DeskController@excluirMesa')->name('excluirMesa');
 Route::post('/imprimirCupom', 'SellController@imprimirCupom')->name('imprimirCupom');
+Route::get('/imprimirFichas', 'SellController@imprimirFichas')->name('imprimirFichas');
 Route::post('/dadosEmpresa', 'CompanyController@atualizar')->name('dadosEmpresa');

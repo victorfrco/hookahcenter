@@ -26,6 +26,7 @@ use function dd;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use function MongoDB\BSON\toJSON;
 use function redirect;
 use function Sodium\compare;
 use function view;
@@ -48,6 +49,13 @@ class SellController extends Controller
         $categories = Category::all()->where('status','=',1);
         return view('admin.sells.index', compact('categories'));
     }
+
+    public function printOrder(Request $request){
+        $string = $request->get('string');
+
+        return view('admin.sells.ficha', compact('string'));
+    }
+
 	//aplica ou remove preço de associado a uma venda
 	public function aplicarRemoverDesconto(Request $request){
 		$order = Order::find($request->get('order_id'));
@@ -107,7 +115,7 @@ class SellController extends Controller
         $order->save();
 
         $categories = Category::all()->where('status','=',1);
-        return redirect('home')->with(compact('order', 'categories'));
+        return redirect('/home/'.$order->id)->with(compact('order', 'categories'));
     }
 
     public function codBarra(Request $request){
@@ -729,11 +737,15 @@ class SellController extends Controller
         $itens = Item::hydrate($itens);
 
         $company = Company::find(1);
-        $cabecalhoLoja = '<h1 style=" line-height: 10%; text-align: center;">'.$company->name.'</h1>
-                            <h5 style="line-height: 80%;width: 250px; text-align: center;">'.$company->phone.'</h5>
-                            <p style="font-size: 10px; line-height: 80%;width: 250px;">'.$company->address.'</p>
-                            <p style="font-size: 10px;line-height: 10%;">CNPJ: '.$company->cnpj.'</p> 
-                            <hr><p style="font-weight: bold; font-size: 12px; text-align: center; margin-top: -8px; margin-bottom: -5px">*** sem valor fiscal ***</p>';
+        if(isset($company->name))
+            $cabecalhoLoja = '<h1 style=" line-height: 10%; text-align: center;">'.$company->name.'</h1>';
+        if(isset($company->phone))
+            $cabecalhoLoja .= '<h5 style="line-height: 80%;width: 250px; text-align: center;">'.$company->phone.'</h5>';
+        if(isset($company->address))
+            $cabecalhoLoja .= '<p style="font-size: 10px; line-height: 80%;width: 250px;">'.$company->address.'</p>';
+        if(isset($company->cnpj))
+            $cabecalhoLoja .= '<p style="font-size: 10px;line-height: 10%;">CNPJ: '.$company->cnpj.'</p>';
+        $cabecalhoLoja .= '<hr><p style="font-weight: bold; font-size: 12px; text-align: center; margin-top: -8px; margin-bottom: -5px">*** sem valor fiscal ***</p>';
 
 
         $tableHeader = '<table class="table table-condensed" style="width: 280px;font-size: 10px">
@@ -771,11 +783,11 @@ class SellController extends Controller
         $tableCont = implode($tableCont);
 
         $valorPago = 0;
-            if(\App\Http\Controllers\OrderController::possuiPagamento($order))
-                $valorPago = \App\Http\Controllers\OrderController::valorPago($order);
+        if(\App\Http\Controllers\OrderController::possuiPagamento($order))
+            $valorPago = \App\Http\Controllers\OrderController::valorPago($order);
 
-            if($valorPago > 0){
-                $valorTotal = '<TABLE CLASS="table table-condensed" style="width: 250px;font-size: 10px">
+        if($valorPago > 0){
+            $valorTotal = '<TABLE CLASS="table table-condensed" style="width: 250px;font-size: 10px">
                                    <TR>
                                        <TH  style="text-align: left;">VALOR TOTAL:</TH>
                                        <TH style="text-align: right;">R$'.number_format($total, 2, ',', '.').'</TH>
@@ -789,11 +801,11 @@ class SellController extends Controller
                                        <TH style="text-align: right;">R$'.number_format($total - $valorPago, 2, ',', '.').'</TH>
                                    </TR>
                                </TABLE>';
-            }else{
-                $valorTotal = '<TABLE CLASS="table table-condensed" style="width: 250px;font-size: 10px"><TR><TH  style="text-align: left;">VALOR TOTAL:</TH><TH style="text-align: right;">R$'.number_format($total, 2, ',', '.').'</TH></TR></TABLE>';
-            }
+        }else{
+            $valorTotal = '<TABLE CLASS="table table-condensed" style="width: 250px;font-size: 10px"><TR><TH  style="text-align: left;">VALOR TOTAL:</TH><TH style="text-align: right;">R$'.number_format($total, 2, ',', '.').'</TH></TR></TABLE>';
+        }
 
-        $msgAmistosa = '<p style="font-size: 10px">'.$company->msg.'</p>';
+        $msgAmistosa = '<p style="text-align: center; font-size: 10px">'.$company->msg.'</p>';
 
         $bonificacoesTable = '';
         if(OrderController::possuiBonificacao($order)) {
@@ -834,6 +846,34 @@ class SellController extends Controller
 ////
 //        $pdf = PDF::loadView( 'admin.sells.cupom', compact( 'string' ) );
 //        return $pdf->download( 'Cupom_Venda_'.$order->id.'.pdf' );
+    }
+
+    public function imprimirFichas(Request $request)
+    {
+        $order_id = $request->order_id;
+        $order = Order::find($order_id);
+        $itens = DB::table('itens')->select('*')->where('order_id','=',$order_id)->orderByDesc('updated_at')->get()->toArray();
+        $itens = Item::hydrate($itens);
+        $fichas = [];
+        $company = Company::find(1);
+        $cabecalhoLoja = ' <h4 style="line-height: 10%; text-align: center;">'.$company->name.'</h4>
+                            <h5 style="line-height: 80%; text-align: center;"> Pedido: '.$order->id.'</h5>';
+
+        foreach ($itens as $item){
+
+            $product = Product::find($item->product_id);
+
+            $produto = '<h1 style="text-align: center;">'.$product->name.'</h1>';
+            $msgAmistosa = '<p style="text-align: center; font-size: 10px">'.$company->msg.'</p>';
+
+
+            array_push($fichas, $cabecalhoLoja.$produto.$msgAmistosa);
+        }
+
+        //$string = strtr($string, array('\\' => '\\\\', "'" => "\\'", '"' => '\\"',
+        //"\r" => '\\r', "\n" => '\\n' ));
+
+        return response()->json(['status_code' => '200', 'data' => $fichas]);
     }
 
 }
