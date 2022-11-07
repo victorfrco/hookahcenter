@@ -20,8 +20,12 @@
             @if(isset($orders))
                 {!! Table::withContents($orders->items())
                  ->callback('Ações', function($campo, $model){
-                    $linkEdit = route('historyDetail', ['order' => $model->id]);
-                     return Button::link('Ver Detalhes &nbsp'.Icon::create('eye-open'))->asLinkTo($linkEdit);
+                    $linkDetail = route('historyDetail', ['order' => $model->id]);
+                     return Button::link('Ver Detalhes &nbsp'.Icon::create('eye-open'))->asLinkTo($linkDetail).' | '
+                 .Form::open(array('action' => 'SellController@imprimirCupom', 'method' => 'post', 'style' => 'display:inline', 'target'=>'_blank'))
+                .Form::hidden('order_id',$model->id)
+                .Form::button('Imprimir '.Icon::create('list-alt'), ['type' => 'submit', 'class' => 'btn btn-link', 'style' => '', 'rel'=>'tooltip', 'title'=>'Imprimir cupom da venda'] )
+                .Form::close();
                  })->withAttributes([
                     'style' => 'font-size: 13px'
                  ]);

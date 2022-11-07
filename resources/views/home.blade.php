@@ -65,10 +65,7 @@
                     {!! Button::danger(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#removerAssociadoModal', 'rel'=>'tooltip', 'title'=>'Aplicar desconto conforme tabela'])  !!}
                     {!! Button::primary(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true', 'rel'=>'tooltip', 'title'=>'Aplicar taxa do cartão conforme tabela'])  !!}
                 @endif
-                    {!! Form::open(array('action' => 'SellController@imprimirCupom', 'method' => 'post', 'style' => 'display:inline', 'target'=>'_blank')) !!}
-                    {!! Form::hidden('order_id',$order->id) !!}
-                    {!! Form::button(Icon::create('list-alt'), ['type' => 'submit', 'class' => 'btn btn-primary btn-sm', 'style' => 'width:40px;display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'rel'=>'tooltip', 'title'=>'Imprimir cupom da venda'] )  !!}
-                    {!! Form::close() !!}
+                    {!! Button::primary(Icon::create('list-alt'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'rel'=>'tooltip', 'title'=>'Imprimir Fichas', 'onclick'=>'imprimirFichinhas('. $order->id.')','id'=> 'imprimirFichinhas','data-url'=>route('admin.sells.ficha')])  !!}
             @else
                 {!! Button::primary(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true', 'rel'=>'tooltip', 'title'=>'Aplicar desconto conforme tabela'])  !!}
                 {!! Button::primary(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true', 'rel'=>'tooltip', 'title'=>'Aplicar taxa do cartão conforme tabela'])  !!}
@@ -113,7 +110,7 @@
                             if($order->type == 2)
                                 echo \App\Desk::all()->where('order_id','=', $order->id)->where('status','=',1)->first()->name.' ('.$order->id.')';
                             else
-                                echo $order->client->name.'('.$order->id.')';
+                                echo $order->client->name.' ('.$order->id.')';
                             @endphp
                         </div>
                         {!! $tabela = App\Models\Sell::atualizaTabelaDeItens($order->id)!!}
@@ -310,6 +307,27 @@
             e.preventDefault();
             window.location = $('#tabsCategorias').attr('data-url');
         });
+
+        function imprimirFichinhas($order_id) {
+
+            var fichas = function () {
+                var tmp = null;
+                $.ajax({
+                    async: false,
+                    url: "{{ route('imprimirFichas') }}",
+                    data: {"order_id":$order_id},
+                    type: 'get',
+                    success: function(result){
+                        tmp = result;
+                    }
+                });
+                return tmp;
+            }();
+
+            fichas.data.forEach(function(item){
+                window.open($('#imprimirFichinhas').attr('data-url')+'?string='+encodeURIComponent(item), '_blank');
+            });
+        }
 
         function total() {
             if (document.getElementById('formaPagamentoTotal').value === '4') {
