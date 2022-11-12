@@ -739,11 +739,11 @@ class SellController extends Controller
 
         $company = Company::find(1);
         if(isset($company->name))
-            $cabecalhoLoja = '<h1 style=" line-height: 10%; text-align: center;">'.$company->name.'</h1>';
+            $cabecalhoLoja = '<h2 style=" line-height: 10%; text-align: center;">'.$company->name.'</h2>';
         if(isset($company->phone))
-            $cabecalhoLoja .= '<h5 style="line-height: 80%;width: 250px; text-align: center;">'.$company->phone.'</h5>';
+            $cabecalhoLoja .= '<h4 style="line-height: 80%;width: 250px; text-align: center;">'.$company->phone.'</h4>';
         if(isset($company->address))
-            $cabecalhoLoja .= '<p style="font-size: 10px; line-height: 80%;width: 250px;">'.$company->address.'</p>';
+            $cabecalhoLoja .= '<p style="font-size: 10px; line-height: 80%;width: 250px; text-align: center;">'.$company->address.'</p>';
         if(isset($company->cnpj))
             $cabecalhoLoja .= '<p style="font-size: 10px;line-height: 10%;">CNPJ: '.$company->cnpj.'</p>';
         $cabecalhoLoja .= '<hr><p style="font-weight: bold; font-size: 12px; text-align: center; margin-top: -8px; margin-bottom: -5px">*** sem valor fiscal ***</p>';

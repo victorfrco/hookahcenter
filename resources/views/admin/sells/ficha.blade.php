@@ -8,5 +8,5 @@
 </html>
 
 <script>
-    //window.onload = function() { window.print(); window.close();}
+    window.onload = function() { window.print(); window.close();}
 </script>
