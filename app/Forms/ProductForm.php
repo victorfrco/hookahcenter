@@ -27,6 +27,7 @@ class ProductForm extends Form
                     return $brand;
                 }
             ])
-            ->add('status','checkbox',['label' => 'Ativo']);
+            ->add('status','checkbox',['label' => 'Ativo'])
+            ->add('printable','checkbox',['label' => 'Imprimir Ficha']);
     }
 }

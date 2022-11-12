@@ -6,6 +6,7 @@ use App\CashMoves;
 use App\Company;
 use App\Desk;
 use App\DeskHistory;
+use App\Models\Brand;
 use App\Models\Cash;
 use App\Models\Client;
 use App\Models\Item;
@@ -856,18 +857,27 @@ class SellController extends Controller
         $itens = Item::hydrate($itens);
         $fichas = [];
         $company = Company::find(1);
-        $cabecalhoLoja = ' <h4 style="line-height: 10%; text-align: center;">'.$company->name.'</h4>
-                            <h5 style="line-height: 80%; text-align: center;"> Pedido: '.$order->id.'</h5>';
+        $cabecalhoLoja = ' <h5 style="line-height: 10%; text-align: center;">'.$company->name.'</h5>
+                            <h6 style="line-height: 80%; text-align: center;"> Pedido: '.$order->id.'</h6>';
 
         foreach ($itens as $item){
-
             $product = Product::find($item->product_id);
+            if($product->printable){
+                for ($i=0; $i< $item->qtd; $i++){
 
-            $produto = '<h1 style="text-align: center;">'.$product->name.'</h1>';
-            $msgAmistosa = '<p style="text-align: center; font-size: 10px">'.$company->msg.'</p>';
+                    $brand = Brand::find($product->brand_id);
+                    $category = Category::find($brand->category_id);
+                    if($category->print_duplicate){
+                        $produto = '<h2 style="text-align: center;">'.$product->name.'</h2>';
+                        $msgAmistosa = '<p style="text-align: center; font-size: 10px">Item Cozinha</p>';
+                        array_push($fichas, $cabecalhoLoja.$produto.$msgAmistosa);
+                    }
+                    $produto = '<h2 style="text-align: center;">'.$product->name.'</h2>';
+                    $msgAmistosa = '<p style="text-align: center; font-size: 10px">'.$company->msg.'</p>';
 
-
-            array_push($fichas, $cabecalhoLoja.$produto.$msgAmistosa);
+                    array_push($fichas, $cabecalhoLoja.$produto.$msgAmistosa);
+                }
+            }
         }
 
         //$string = strtr($string, array('\\' => '\\\\', "'" => "\\'", '"' => '\\"',

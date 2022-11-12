@@ -110,9 +110,12 @@ class ProductController extends Controller
 //        $data['price_discount'] = str_replace($source, $replace, $data['price_discount']);
 //        $data['price_card'] = str_replace($source, $replace, $data['price_card']);
         $data['status'] = $data['status'] == null ? 0 : 1;
+        $data['printable'] = $data['printable'] == null ? 0 : 1;
+
+        var_dump($data);
 
         $teste = DB::table('products')->where('barcode','=', $data['barcode'])->count('*');
-        if($teste > 0) {
+        if($teste > 0 && !isEmptyOrNullString($teste)) {
             session()->flash('message', 'Código de Barras já cadastrado em outro produto!');
             return redirect()
                 ->back()
@@ -179,9 +182,11 @@ class ProductController extends Controller
         $data['price_discount'] = Sell::converteMoedaParaDecimal($data['price_discount']);
         $data['price_card'] = Sell::converteMoedaParaDecimal($data['price_card']);
         $data['status'] = $data['status'] == null ? 0 : 1;
+        $data['printable'] = $data['printable'] == null ? 0 : 1;
+
 
         $teste = DB::table('products')->where('barcode','=', $data['barcode'])->where('id', '<>',$product->id)->count('*');
-        if($teste > 0) {
+        if($teste > 0 && !isEmptyOrNullString($teste)) {
             session()->flash('message', 'Código de Barras já cadastrado em outro produto!');
             return redirect()
                 ->back()

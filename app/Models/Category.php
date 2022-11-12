@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model implements TableInterface
 {
     protected $table = 'categories';
-    protected $fillable = ['name', 'description','status'];
+    protected $fillable = ['name', 'description','status', 'print_duplicate'];
 
     public function brands()
     {
