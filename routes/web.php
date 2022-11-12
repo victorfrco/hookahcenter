@@ -55,9 +55,8 @@ Route::get('/modal/{product_id?}',function($product_id){
     return Response::json($resposta);
 });
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::get('/', 'HomeController@index')->name('home');
 
 Route::prefix('admin')->group(function(){
     Auth::routes();

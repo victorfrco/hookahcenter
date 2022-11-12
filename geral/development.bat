@@ -1,7 +1,5 @@
 @echo off
-start C:\starthttpd.vbs
-start C:\startmysqld.vbs
-start chrome http://localhost:8000
-cd \Users\Victor\FederalHookah\federalHookah
+start firefox http://localhost:8000
+cd C:\Program Files\hookahcenter
 php artisan serve
 Exit
